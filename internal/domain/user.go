@@ -17,9 +17,10 @@ type User struct {
 	joinDate    time.Time
 }
 
-func NewUser(email, username, description string, userRoles []UserRole) *User {
-	// TODO: Business validation.
-	// 1. Can't have empty user roles, must be something at least
+func NewUser(email, username, description string, userRoles []UserRole) (*User, error) {
+	if len(userRoles) == 0 {
+		return nil, ErrMissingUserRoles
+	}
 
 	now := time.Now()
 
@@ -43,7 +44,7 @@ func NewUser(email, username, description string, userRoles []UserRole) *User {
 	event := NewUserCreatedEvent(user.GetID(), email, username, description, userRoles, now)
 	user.RecordEvent(event)
 
-	return user
+	return user, nil
 }
 
 func (a User) GetID() UserID {
