@@ -18,6 +18,9 @@ type User struct {
 }
 
 func NewUser(email, username, description string, userRoles []UserRole) *User {
+	// TODO: Business validation.
+	// 1. Can't have empty user roles, must be something at least
+
 	now := time.Now()
 
 	setRoles := map[UserRole]bool{}
@@ -37,7 +40,7 @@ func NewUser(email, username, description string, userRoles []UserRole) *User {
 	newID := NewUserID(uuid.New().String())
 	user.SetID(newID)
 
-	event := NewUserCreatedEvent(user.GetID(), email, username, description, now)
+	event := NewUserCreatedEvent(user.GetID(), email, username, description, userRoles, now)
 	user.RecordEvent(event)
 
 	return user
@@ -69,14 +72,6 @@ func (a User) UserRoles() []UserRole {
 	return roleSlice
 }
 
-func (a *User) AddRole(role UserRole) {
-	a.userRoles[role] = true
-}
-
-func (a *User) RemoveRole(role UserRole) {
-	delete(a.userRoles, role)
-}
-
 func (a User) CanCreatePost() bool {
 	return a.userRoles[UserRoleAuthor]
 }
@@ -89,10 +84,28 @@ func (a User) IsAdmin() bool {
 	return a.userRoles[UserRoleAdmin]
 }
 
+func (a *User) AddRole(role UserRole) {
+	a.userRoles[role] = true
+
+	event := NewUserRoleAddedEvent(a.GetID(), role)
+	a.RecordEvent(event)
+}
+
+func (a *User) RemoveRole(role UserRole) {
+	delete(a.userRoles, role)
+
+	event := NewUserRoleRemovedEvent(a.GetID(), role)
+	a.RecordEvent(event)
+}
+
 func (a *User) UpdateDescription(newDescription string) error {
 	if len(newDescription) > 255 {
 		return ErrDescriptionTooLong
 	}
 	a.description = newDescription
+
+	event := NewUserDescriptionUpdatedEvent(a.GetID(), newDescription)
+	a.RecordEvent(event)
+
 	return nil
 }
