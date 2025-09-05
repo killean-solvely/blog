@@ -24,7 +24,7 @@ func New[T any](path string) (*T, error) {
 	t := reflect.TypeOf(cfg)
 
 	// Handle both struct types and pointers to struct types
-	if t.Kind() == reflect.Ptr {
+	if t.Kind() == reflect.Pointer {
 		t = t.Elem()
 	}
 
