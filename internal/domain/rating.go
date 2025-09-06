@@ -49,6 +49,12 @@ func (a *Rating) SetID(id RatingID) {
 	a.AggregateBase.SetID(string(id))
 }
 
+func (a Rating) PostID() PostID         { return a.postID }
+func (a Rating) UserID() UserID         { return a.userID }
+func (a Rating) RatingType() RatingType { return a.ratingType }
+func (a Rating) CreatedAt() time.Time   { return a.createdAt }
+func (a Rating) UpdatedAt() *time.Time  { return a.updatedAt }
+
 func (a *Rating) ChangeRating(ratingType RatingType) {
 	now := time.Now()
 	a.ratingType = ratingType
