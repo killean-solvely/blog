@@ -10,4 +10,7 @@ var (
 	// Post
 	ErrTitleCannotBeEmpty   = errors.New("post title cannot be empty")
 	ErrContentCannotBeEmpty = errors.New("post content cannot be empty")
+
+	// Comment
+	ErrCommentCannotBeEmpty = errors.New("comment cannot be empty")
 )
