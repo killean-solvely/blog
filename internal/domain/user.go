@@ -71,10 +71,11 @@ func (a *User) SetID(id UserID) {
 	a.AggregateBase.SetID(string(id))
 }
 
-func (a User) Email() string       { return a.email }
-func (a User) Username() string    { return a.username }
-func (a User) Description() string { return a.description }
-func (a User) JoinDate() time.Time { return a.joinDate }
+func (a User) Email() string        { return a.email }
+func (a User) Username() string     { return a.username }
+func (a User) PasswordHash() string { return a.passwordHash }
+func (a User) Description() string  { return a.description }
+func (a User) JoinDate() time.Time  { return a.joinDate }
 
 func (a User) UserRoles() []UserRole {
 	roleSlice := []UserRole{}
@@ -121,5 +122,26 @@ func (a *User) UpdateDescription(newDescription string) error {
 	event := NewUserDescriptionUpdatedEvent(a.GetID(), newDescription)
 	a.RecordEvent(event)
 
+	return nil
+}
+
+func (a *User) UpdatePassword(passwordHash string) error {
+	a.passwordHash = passwordHash
+
+	event := NewUserPasswordUpdatedEvent(a.GetID(), passwordHash)
+	a.RecordEvent(event)
+
+	return nil
+}
+
+func RebuildUser(
+	id UserID,
+	email string,
+	passwordHash string,
+	username string,
+	description string,
+	userRoles []UserRole,
+	joinDate time.Time,
+) *User {
 	return nil
 }

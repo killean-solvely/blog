@@ -11,6 +11,7 @@ const (
 	UserRoleAddedEventType          EventType = "UserRoleAdded"
 	UserRoleRemovedEventType        EventType = "UserRoleRemoved"
 	UserDescriptionUpdatedEventType EventType = "UserDescriptionUpdated"
+	UserPasswordUpdatedEventType    EventType = "UserPasswordUpdated"
 )
 
 type UserCreatedEvent struct {
@@ -97,6 +98,23 @@ func (e UserDescriptionUpdated) OccurredOn() time.Time { return e.occurredOn }
 
 func (e UserDescriptionUpdated) EventType() string { return string(UserDescriptionUpdatedEventType) }
 
+type UserPasswordUpdated struct {
+	UserID     UserID
+	Password   string
+	occurredOn time.Time
+}
+
+func NewUserPasswordUpdatedEvent(id UserID, description string) *UserPasswordUpdated {
+	return &UserPasswordUpdated{
+		UserID:     id,
+		Password:   description,
+		occurredOn: time.Now(),
+	}
+}
+
+func (e UserPasswordUpdated) OccurredOn() time.Time { return e.occurredOn }
+func (e UserPasswordUpdated) EventType() string     { return string(UserPasswordUpdatedEventType) }
+
 func init() {
 	ddd.EventRegistry.Register(
 		UserCreatedEvent{},
@@ -116,5 +134,10 @@ func init() {
 	ddd.EventRegistry.Register(
 		UserDescriptionUpdated{},
 		"Raised when a user's description is updated",
+	)
+
+	ddd.EventRegistry.Register(
+		UserPasswordUpdated{},
+		"Raised when a user's password is updated",
 	)
 }
