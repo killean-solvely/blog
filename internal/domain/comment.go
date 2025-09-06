@@ -85,3 +85,24 @@ func (a *Comment) Archive() {
 	event := NewCommentArchivedEvent(a.GetID(), now)
 	a.RecordEvent(event)
 }
+
+func RebuildComment(
+	id CommentID,
+	postID PostID,
+	commenterID UserID,
+	content string,
+	createdAt time.Time,
+	lastUpdatedAt *time.Time,
+	archivedAt *time.Time,
+) *Comment {
+	comment := &Comment{
+		postID:        postID,
+		commenterID:   commenterID,
+		content:       content,
+		createdAt:     createdAt,
+		lastUpdatedAt: lastUpdatedAt,
+		archivedAt:    archivedAt,
+	}
+	comment.SetID(id)
+	return comment
+}
