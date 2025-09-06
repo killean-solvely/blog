@@ -58,6 +58,7 @@ func (a *Post) SetID(id PostID) {
 	a.AggregateBase.SetID(string(id))
 }
 
+func (a Post) AuthorID() UserID         { return a.authorID }
 func (a Post) Title() string            { return a.title }
 func (a Post) Content() string          { return a.content }
 func (a Post) CreatedAt() time.Time     { return a.createdAt }
@@ -97,4 +98,22 @@ func (a *Post) Archive() {
 
 	event := NewPostArchivedEvent(a.GetID(), now)
 	a.RecordEvent(event)
+}
+
+func RebuildPost(
+	authorID UserID,
+	title string,
+	content string,
+	createdAt time.Time,
+	lastEditedAt *time.Time,
+	archivedAt *time.Time,
+) *Post {
+	return &Post{
+		authorID:     authorID,
+		title:        title,
+		content:      content,
+		createdAt:    createdAt,
+		lastEditedAt: lastEditedAt,
+		archivedAt:   archivedAt,
+	}
 }
