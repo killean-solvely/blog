@@ -10,14 +10,18 @@ import (
 
 type User struct {
 	*ddd.AggregateBase
-	email       string
-	username    string
-	description string
-	userRoles   map[UserRole]bool
-	joinDate    time.Time
+	email        string
+	passwordHash string
+	username     string
+	description  string
+	userRoles    map[UserRole]bool
+	joinDate     time.Time
 }
 
-func NewUser(email, username, description string, userRoles []UserRole) (*User, error) {
+func NewUser(
+	email, username, passwordHash, description string,
+	userRoles []UserRole,
+) (*User, error) {
 	if len(userRoles) == 0 {
 		return nil, ErrMissingUserRoles
 	}
@@ -32,6 +36,7 @@ func NewUser(email, username, description string, userRoles []UserRole) (*User, 
 	user := &User{
 		AggregateBase: &ddd.AggregateBase{},
 		email:         email,
+		passwordHash:  passwordHash,
 		username:      username,
 		description:   description,
 		userRoles:     setRoles,
@@ -41,7 +46,15 @@ func NewUser(email, username, description string, userRoles []UserRole) (*User, 
 	newID := NewUserID(uuid.New().String())
 	user.SetID(newID)
 
-	event := NewUserCreatedEvent(user.GetID(), email, username, description, userRoles, now)
+	event := NewUserCreatedEvent(
+		user.GetID(),
+		email,
+		passwordHash,
+		username,
+		description,
+		userRoles,
+		now,
+	)
 	user.RecordEvent(event)
 
 	return user, nil

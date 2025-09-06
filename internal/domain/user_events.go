@@ -14,29 +14,31 @@ const (
 )
 
 type UserCreatedEvent struct {
-	UserID      UserID
-	Email       string
-	Username    string
-	Description string
-	UserRoles   []UserRole
-	JoinDate    time.Time
-	occurredOn  time.Time
+	UserID       UserID
+	Email        string
+	PasswordHash string
+	Username     string
+	Description  string
+	UserRoles    []UserRole
+	JoinDate     time.Time
+	occurredOn   time.Time
 }
 
 func NewUserCreatedEvent(
 	id UserID,
-	email, username, description string,
+	email, username, passwordHash, description string,
 	userRoles []UserRole,
 	joinDate time.Time,
 ) *UserCreatedEvent {
 	return &UserCreatedEvent{
-		UserID:      id,
-		Email:       email,
-		Username:    username,
-		Description: description,
-		UserRoles:   userRoles,
-		JoinDate:    joinDate,
-		occurredOn:  time.Now(),
+		UserID:       id,
+		Email:        email,
+		PasswordHash: passwordHash,
+		Username:     username,
+		Description:  description,
+		UserRoles:    userRoles,
+		JoinDate:     joinDate,
+		occurredOn:   time.Now(),
 	}
 }
 
