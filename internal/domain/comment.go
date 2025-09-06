@@ -96,6 +96,7 @@ func RebuildComment(
 	archivedAt *time.Time,
 ) *Comment {
 	comment := &Comment{
+		AggregateBase: &ddd.AggregateBase{},
 		postID:        postID,
 		commenterID:   commenterID,
 		content:       content,

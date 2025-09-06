@@ -110,12 +110,13 @@ func RebuildPost(
 	archivedAt *time.Time,
 ) *Post {
 	post := &Post{
-		authorID:     authorID,
-		title:        title,
-		content:      content,
-		createdAt:    createdAt,
-		lastEditedAt: lastEditedAt,
-		archivedAt:   archivedAt,
+		AggregateBase: &ddd.AggregateBase{},
+		authorID:      authorID,
+		title:         title,
+		content:       content,
+		createdAt:     createdAt,
+		lastEditedAt:  lastEditedAt,
+		archivedAt:    archivedAt,
 	}
 	post.SetID(id)
 	return post
