@@ -3,8 +3,9 @@ package domain
 type PostRepository interface {
 	All() ([]Post, error)
 	FindByID(id PostID) (*Post, error)
+	FindByAuthor(authorID UserID) ([]Post, error)
 	Create(post *Post) (*Post, error)
-	UpdateTitle(newTitle string) error
-	UpdateContent(newContent string) error
+	UpdateTitle(id PostID, newTitle string) error
+	UpdateContent(id PostID, newContent string) error
 	Archive(id PostID) error
 }

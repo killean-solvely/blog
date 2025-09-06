@@ -5,6 +5,6 @@ type UserRepository interface {
 	FindByID(id UserID) (*User, error)
 	Exists(id UserID) (bool, error)
 	Create(user *User) (*User, error)
-	UpdateRoles(roles []UserRole) error
-	UpdateDescription(newDescription string) error
+	UpdateRoles(id UserID, roles []UserRole) error
+	UpdateDescription(id UserID, newDescription string) error
 }

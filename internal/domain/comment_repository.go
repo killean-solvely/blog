@@ -6,6 +6,6 @@ type CommentRepository interface {
 	FindByUser(userID UserID) ([]Comment, error)
 	FindByPost(postID PostID) ([]Comment, error)
 	Create(comment *Comment) (*Comment, error)
-	UpdateContent(newContent string) error
+	UpdateContent(id CommentID, newContent string) error
 	Archive(id CommentID) error
 }
