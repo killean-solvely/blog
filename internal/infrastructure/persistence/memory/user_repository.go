@@ -49,6 +49,32 @@ func (r *UserRepository) Exists(id domain.UserID) (bool, error) {
 	return exists, nil
 }
 
+func (r *UserRepository) UsernameExists(username string) (bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	for _, v := range r.users {
+		if v.Username() == username {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func (r *UserRepository) EmailExists(email string) (bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	for _, v := range r.users {
+		if v.Email() == email {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
 func (r *UserRepository) Create(user *domain.User) (*domain.User, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
