@@ -106,3 +106,63 @@ func (dto CommentDTO) ToDomain() *domain.Comment {
 		dto.ArchivedAt,
 	)
 }
+
+type UserDTO struct {
+	ID           string
+	Email        string
+	PasswordHash string
+	Username     string
+	Description  string
+	UserRoles    []string
+	JoinDate     time.Time
+}
+
+func NewUserDTO(
+	id, email, username, passwordHash, description string,
+	userRoles []string,
+	joinDate time.Time,
+) *UserDTO {
+	return &UserDTO{
+		ID:           id,
+		Email:        email,
+		PasswordHash: passwordHash,
+		Username:     username,
+		Description:  description,
+		UserRoles:    userRoles,
+		JoinDate:     joinDate,
+	}
+}
+
+func (dto *UserDTO) FromDomain(user *domain.User) {
+	roles := []string{}
+	for _, role := range user.UserRoles() {
+		roles = append(roles, role.String())
+	}
+
+	dto = NewUserDTO(
+		user.GetID().String(),
+		user.Email(),
+		user.Username(),
+		user.PasswordHash(),
+		user.Description(),
+		roles,
+		user.JoinDate(),
+	)
+}
+
+func (dto *UserDTO) ToDomain() *domain.User {
+	roles := []domain.UserRole{}
+	for _, role := range dto.UserRoles {
+		roles = append(roles, domain.UserRole(role))
+	}
+
+	return domain.RebuildUser(
+		domain.NewUserID(dto.ID),
+		dto.Email,
+		dto.PasswordHash,
+		dto.Username,
+		dto.Description,
+		roles,
+		dto.JoinDate,
+	)
+}
