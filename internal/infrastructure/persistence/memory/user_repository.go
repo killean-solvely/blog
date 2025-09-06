@@ -114,7 +114,7 @@ func (r *UserRepository) UpdatePasswordHash(id domain.UserID, newPasswordHash st
 	defer r.mu.Unlock()
 
 	u := r.users[id]
-	u.UpdatePassword(newPasswordHash)
+	u.UpdatePasswordHash(newPasswordHash)
 	r.users[id] = u
 
 	return nil

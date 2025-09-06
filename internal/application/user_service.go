@@ -186,7 +186,7 @@ func (s *UserService) UpdatePassword(userID, password string) error {
 		return err
 	}
 
-	if err := user.UpdatePassword(string(passwordHash)); err != nil {
+	if err := user.UpdatePasswordHash(string(passwordHash)); err != nil {
 		return err
 	}
 

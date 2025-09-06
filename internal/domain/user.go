@@ -125,7 +125,7 @@ func (a *User) UpdateDescription(newDescription string) error {
 	return nil
 }
 
-func (a *User) UpdatePassword(passwordHash string) error {
+func (a *User) UpdatePasswordHash(passwordHash string) error {
 	a.passwordHash = passwordHash
 
 	event := NewUserPasswordUpdatedEvent(a.GetID(), passwordHash)
