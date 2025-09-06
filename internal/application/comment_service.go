@@ -75,6 +75,76 @@ func (s *CommentService) CreateComment(
 	return &commentDTO, nil
 }
 
+func (s *CommentService) EditComment(
+	id string,
+	content string,
+) error {
+	domainID := domain.NewCommentID(id)
+
+	// Check that the comment exists
+	if exists, err := s.commentRepo.Exists(domainID); !exists || err != nil {
+		if err != nil {
+			return err
+		}
+		return errors.New("comment does not exist")
+	}
+
+	// Get and update the comment
+	comment, err := s.commentRepo.FindByID(domainID)
+	if err != nil {
+		return err
+	}
+
+	if err := comment.Edit(content); err != nil {
+		return err
+	}
+
+	// Persist
+	if err := s.commentRepo.UpdateContent(domainID, content); err != nil {
+		return err
+	}
+
+	// Dispatch the events
+	if err := s.dispatchAggregateEvents(comment); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *CommentService) ArchiveComment(
+	id string,
+) error {
+	domainID := domain.NewCommentID(id)
+
+	// Check that the comment exists
+	if exists, err := s.commentRepo.Exists(domainID); !exists || err != nil {
+		if err != nil {
+			return err
+		}
+		return errors.New("comment does not exist")
+	}
+
+	// Get and update the comment
+	comment, err := s.commentRepo.FindByID(domainID)
+	if err != nil {
+		return err
+	}
+	comment.Archive()
+
+	// Persist
+	if err := s.commentRepo.Archive(domainID); err != nil {
+		return err
+	}
+
+	// Dispatch the events
+	if err := s.dispatchAggregateEvents(comment); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Helper method to dispatch events for any aggregate with AggregateBase
 func (s *CommentService) dispatchAggregateEvents(aggregate ddd.EventAggregate) error {
 	events := aggregate.GetUncommittedEvents()
