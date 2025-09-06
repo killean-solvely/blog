@@ -101,6 +101,7 @@ func (a *Post) Archive() {
 }
 
 func RebuildPost(
+	id PostID,
 	authorID UserID,
 	title string,
 	content string,
@@ -108,7 +109,7 @@ func RebuildPost(
 	lastEditedAt *time.Time,
 	archivedAt *time.Time,
 ) *Post {
-	return &Post{
+	post := &Post{
 		authorID:     authorID,
 		title:        title,
 		content:      content,
@@ -116,4 +117,6 @@ func RebuildPost(
 		lastEditedAt: lastEditedAt,
 		archivedAt:   archivedAt,
 	}
+	post.SetID(id)
+	return post
 }

@@ -7,6 +7,7 @@ import (
 )
 
 type PostDTO struct {
+	ID           string     `json:"id"`
 	AuthorID     string     `json:"author_id"`
 	Title        string     `json:"title"`
 	Content      string     `json:"content"`
@@ -16,11 +17,12 @@ type PostDTO struct {
 }
 
 func NewPostDTO(
-	authorID, title, content string,
+	id, authorID, title, content string,
 	createdAt time.Time,
 	lastEditedAt, archivedAt *time.Time,
 ) *PostDTO {
 	return &PostDTO{
+		ID:           id,
 		AuthorID:     authorID,
 		Title:        title,
 		Content:      content,
@@ -32,6 +34,7 @@ func NewPostDTO(
 
 func (dto *PostDTO) FromDomain(post *domain.Post) {
 	dto = NewPostDTO(
+		post.GetID().String(),
 		post.AuthorID().String(),
 		post.Title(),
 		post.Content(),
@@ -43,6 +46,7 @@ func (dto *PostDTO) FromDomain(post *domain.Post) {
 
 func (dto PostDTO) ToDomain() *domain.Post {
 	return domain.RebuildPost(
+		domain.NewPostID(dto.ID),
 		domain.NewUserID(dto.AuthorID),
 		dto.Title,
 		dto.Content,
