@@ -63,6 +63,74 @@ func (s *PostService) CreatePost(
 	return &postDTO, nil
 }
 
+func (s *PostService) UpdatePostTitle(postID string, newTitle string) error {
+	domainPostID := domain.NewPostID(postID)
+
+	// Check that the post exists
+	if exists, err := s.postRepo.Exists(domainPostID); !exists || err != nil {
+		if err != nil {
+			return err
+		}
+		return errors.New("post does not exist")
+	}
+
+	// Get the post, then update it
+	post, err := s.postRepo.FindByID(domainPostID)
+	if err != nil {
+		return err
+	}
+
+	if err := post.EditTitle(newTitle); err != nil {
+		return err
+	}
+
+	// Persist
+	if err := s.postRepo.UpdateTitle(domainPostID, newTitle); err != nil {
+		return err
+	}
+
+	// Dispatch the events
+	if err := s.dispatchAggregateEvents(post); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *PostService) UpdatePostContent(postID string, newContent string) error {
+	domainPostID := domain.NewPostID(postID)
+
+	// Check that the post exists
+	if exists, err := s.postRepo.Exists(domainPostID); !exists || err != nil {
+		if err != nil {
+			return err
+		}
+		return errors.New("post does not exist")
+	}
+
+	// Get the post, then update it
+	post, err := s.postRepo.FindByID(domainPostID)
+	if err != nil {
+		return err
+	}
+
+	if err := post.EditContent(newContent); err != nil {
+		return err
+	}
+
+	// Persist
+	if err := s.postRepo.UpdateContent(domainPostID, newContent); err != nil {
+		return err
+	}
+
+	// Dispatch the events
+	if err := s.dispatchAggregateEvents(post); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Helper method to dispatch events for any aggregate with AggregateBase
 func (s *PostService) dispatchAggregateEvents(aggregate ddd.EventAggregate) error {
 	events := aggregate.GetUncommittedEvents()

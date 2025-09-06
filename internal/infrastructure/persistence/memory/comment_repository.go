@@ -70,6 +70,13 @@ func (r *CommentRepository) FindByPost(postID domain.PostID) ([]domain.Comment, 
 	return comments, nil
 }
 
+func (r *CommentRepository) Exists(id domain.CommentID) (bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	_, exists := r.comments[id]
+	return exists, nil
+}
+
 func (r *CommentRepository) Create(comment *domain.Comment) (*domain.Comment, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()

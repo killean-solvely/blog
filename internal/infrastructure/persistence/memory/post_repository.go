@@ -56,6 +56,13 @@ func (r *PostRepository) FindByAuthor(userID domain.UserID) ([]domain.Post, erro
 	return posts, nil
 }
 
+func (r *PostRepository) Exists(id domain.PostID) (bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	_, exists := r.posts[id]
+	return exists, nil
+}
+
 func (r *PostRepository) Create(post *domain.Post) (*domain.Post, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()

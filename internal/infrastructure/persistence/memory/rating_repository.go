@@ -70,6 +70,13 @@ func (r *RatingRepository) FindByPost(postID domain.PostID) ([]domain.Rating, er
 	return ratings, nil
 }
 
+func (r *RatingRepository) Exists(id domain.RatingID) (bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	_, exists := r.ratings[id]
+	return exists, nil
+}
+
 func (r *RatingRepository) Create(rating *domain.Rating) (*domain.Rating, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
