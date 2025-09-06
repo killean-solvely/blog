@@ -76,13 +76,13 @@ func (s *CommentService) CreateComment(
 }
 
 func (s *CommentService) EditComment(
-	id string,
+	commentID string,
 	content string,
 ) error {
-	domainID := domain.NewCommentID(id)
+	domainCommentID := domain.NewCommentID(commentID)
 
 	// Check that the comment exists
-	if exists, err := s.commentRepo.Exists(domainID); !exists || err != nil {
+	if exists, err := s.commentRepo.Exists(domainCommentID); !exists || err != nil {
 		if err != nil {
 			return err
 		}
@@ -90,7 +90,7 @@ func (s *CommentService) EditComment(
 	}
 
 	// Get and update the comment
-	comment, err := s.commentRepo.FindByID(domainID)
+	comment, err := s.commentRepo.FindByID(domainCommentID)
 	if err != nil {
 		return err
 	}
@@ -100,7 +100,7 @@ func (s *CommentService) EditComment(
 	}
 
 	// Persist
-	if err := s.commentRepo.UpdateContent(domainID, content); err != nil {
+	if err := s.commentRepo.UpdateContent(domainCommentID, content); err != nil {
 		return err
 	}
 
@@ -113,12 +113,12 @@ func (s *CommentService) EditComment(
 }
 
 func (s *CommentService) ArchiveComment(
-	id string,
+	commentID string,
 ) error {
-	domainID := domain.NewCommentID(id)
+	domainCommentID := domain.NewCommentID(commentID)
 
 	// Check that the comment exists
-	if exists, err := s.commentRepo.Exists(domainID); !exists || err != nil {
+	if exists, err := s.commentRepo.Exists(domainCommentID); !exists || err != nil {
 		if err != nil {
 			return err
 		}
@@ -126,14 +126,14 @@ func (s *CommentService) ArchiveComment(
 	}
 
 	// Get and update the comment
-	comment, err := s.commentRepo.FindByID(domainID)
+	comment, err := s.commentRepo.FindByID(domainCommentID)
 	if err != nil {
 		return err
 	}
 	comment.Archive()
 
 	// Persist
-	if err := s.commentRepo.Archive(domainID); err != nil {
+	if err := s.commentRepo.Archive(domainCommentID); err != nil {
 		return err
 	}
 
