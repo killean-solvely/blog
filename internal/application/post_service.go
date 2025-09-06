@@ -17,12 +17,12 @@ type PostService struct {
 func NewPostService(
 	postRepo domain.PostRepository,
 	userRepo domain.UserRepository,
-	dispatcher ddd.EventDispatcher,
+	eventDispatcher ddd.EventDispatcher,
 ) *PostService {
 	return &PostService{
 		postRepo:        postRepo,
 		userRepo:        userRepo,
-		eventDispatcher: dispatcher,
+		eventDispatcher: eventDispatcher,
 	}
 }
 
