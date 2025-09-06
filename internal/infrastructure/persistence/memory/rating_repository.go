@@ -77,6 +77,22 @@ func (r *RatingRepository) Exists(id domain.RatingID) (bool, error) {
 	return exists, nil
 }
 
+func (r *RatingRepository) ExistsOnPostByUser(
+	postID domain.PostID,
+	userID domain.UserID,
+) (bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	for _, r := range r.ratings {
+		if r.PostID() == postID && r.UserID() == userID {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
 func (r *RatingRepository) Create(rating *domain.Rating) (*domain.Rating, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()

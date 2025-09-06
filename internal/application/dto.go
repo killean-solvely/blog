@@ -166,3 +166,49 @@ func (dto *UserDTO) ToDomain() *domain.User {
 		dto.JoinDate,
 	)
 }
+
+type RatingDTO struct {
+	ID         string     `json:"id"`
+	PostID     string     `json:"post_id"`
+	UserID     string     `json:"user_id"`
+	RatingType string     `json:"rating_type"`
+	CreatedAt  time.Time  `json:"created_at"`
+	UpdatedAt  *time.Time `json:"updated_at"`
+}
+
+func NewRatingDTO(
+	id, postID, userID, ratingType string,
+	createdAt time.Time,
+	updatedAt *time.Time,
+) *RatingDTO {
+	return &RatingDTO{
+		ID:         id,
+		PostID:     postID,
+		UserID:     userID,
+		RatingType: ratingType,
+		CreatedAt:  createdAt,
+		UpdatedAt:  updatedAt,
+	}
+}
+
+func (dto *RatingDTO) FromDomain(rating *domain.Rating) {
+	dto = NewRatingDTO(
+		rating.GetID().String(),
+		rating.PostID().String(),
+		rating.UserID().String(),
+		rating.RatingType().String(),
+		rating.CreatedAt(),
+		rating.UpdatedAt(),
+	)
+}
+
+func (dto RatingDTO) ToDomain() *domain.Rating {
+	return domain.RebuildRating(
+		domain.NewRatingID(dto.ID),
+		domain.NewPostID(dto.PostID),
+		domain.NewUserID(dto.UserID),
+		domain.RatingType(dto.RatingType),
+		dto.CreatedAt,
+		dto.UpdatedAt,
+	)
+}

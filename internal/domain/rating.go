@@ -68,3 +68,24 @@ func (a *Rating) RemoveRating() {
 	event := NewRatingRemovedEvent(a.GetID())
 	a.RecordEvent(event)
 }
+
+func RebuildRating(
+	id RatingID,
+	postID PostID,
+	userID UserID,
+	ratingType RatingType,
+	createdAt time.Time,
+	updatedAt *time.Time,
+) *Rating {
+	rating := &Rating{
+		AggregateBase: &ddd.AggregateBase{},
+		postID:        postID,
+		userID:        userID,
+		ratingType:    ratingType,
+		createdAt:     createdAt,
+		updatedAt:     updatedAt,
+	}
+
+	rating.SetID(id)
+	return rating
+}
