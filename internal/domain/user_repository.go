@@ -9,4 +9,5 @@ type UserRepository interface {
 	Create(user *User) (*User, error)
 	UpdateRoles(id UserID, roles []UserRole) error
 	UpdateDescription(id UserID, newDescription string) error
+	UpdatePasswordHash(id UserID, passwordHash string) error
 }

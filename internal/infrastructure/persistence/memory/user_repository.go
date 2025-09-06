@@ -108,3 +108,14 @@ func (r *UserRepository) UpdateDescription(id domain.UserID, newDescription stri
 
 	return nil
 }
+
+func (r *UserRepository) UpdatePasswordHash(id domain.UserID, newPasswordHash string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	u := r.users[id]
+	u.UpdatePassword(newPasswordHash)
+	r.users[id] = u
+
+	return nil
+}

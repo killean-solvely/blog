@@ -3,6 +3,7 @@ package application
 import (
 	"errors"
 	"log"
+	"slices"
 
 	"blog/internal/domain"
 	"blog/pkg/ddd"
@@ -78,14 +79,127 @@ func (s *UserService) CreateUser(
 }
 
 func (s *UserService) SetUserRoles(userID string, userRoles []string) error {
+	domainUserID := domain.NewUserID(userID)
+
+	// Ensure the user exists
+	if exists, err := s.userRepo.Exists(domainUserID); !exists || err != nil {
+		if err != nil {
+			return err
+		}
+		return errors.New("user doesn't exist")
+	}
+
+	// Convert parameters to domain variables
+	domainUserRoles := []domain.UserRole{}
+	for _, role := range userRoles {
+		domainUserRoles = append(domainUserRoles, domain.UserRole(role))
+	}
+
+	// Get the user
+	user, err := s.userRepo.FindByID(domainUserID)
+	if err != nil {
+		return err
+	}
+
+	// Remove the roles that don't exist in the new roles, add the roles that do
+	existingRoles := user.UserRoles()
+	for _, role := range existingRoles {
+		if !slices.Contains(domainUserRoles, role) {
+			user.RemoveRole(role)
+		}
+	}
+
+	existingRoles = user.UserRoles()
+	for _, role := range domainUserRoles {
+		if !slices.Contains(existingRoles, role) {
+			user.AddRole(role)
+		}
+	}
+
+	// Persist
+	if err := s.userRepo.UpdateRoles(domainUserID, user.UserRoles()); err != nil {
+		return err
+	}
+
+	// Dispatch the events
+	if err := s.dispatchAggregateEvents(user); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (s *UserService) UpdateDescription(userID, description string) error {
+	domainUserID := domain.NewUserID(userID)
+
+	// Ensure the user exists
+	if exists, err := s.userRepo.Exists(domainUserID); !exists || err != nil {
+		if err != nil {
+			return err
+		}
+		return errors.New("user doesn't exist")
+	}
+
+	// Get the user and update the description
+	user, err := s.userRepo.FindByID(domainUserID)
+	if err != nil {
+		return err
+	}
+
+	if err := user.UpdateDescription(description); err != nil {
+		return err
+	}
+
+	// Persist
+	if err := s.userRepo.UpdateDescription(domainUserID, description); err != nil {
+		return err
+	}
+
+	// Dispatch the events
+	if err := s.dispatchAggregateEvents(user); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (s *UserService) UpdatePassword(userID, password string) error {
+	domainUserID := domain.NewUserID(userID)
+
+	// Ensure the user exists
+	if exists, err := s.userRepo.Exists(domainUserID); !exists || err != nil {
+		if err != nil {
+			return err
+		}
+		return errors.New("user doesn't exist")
+	}
+
+	// Hash the password before passing it into the domain
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	if err != nil {
+		return err
+	}
+
+	// Get the user and update the description
+	user, err := s.userRepo.FindByID(domainUserID)
+	if err != nil {
+		return err
+	}
+
+	if err := user.UpdatePassword(string(passwordHash)); err != nil {
+		return err
+	}
+
+	// Persist
+	if err := s.userRepo.UpdatePasswordHash(domainUserID, string(passwordHash)); err != nil {
+		return err
+	}
+
+	// Dispatch the events
+	if err := s.dispatchAggregateEvents(user); err != nil {
+		return err
+	}
+
 	return nil
 }
 
