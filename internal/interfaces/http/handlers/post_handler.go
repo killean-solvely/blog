@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"blog/internal/application"
+	"blog/internal/interfaces/http/middleware"
 	"blog/internal/interfaces/http/requests"
 
 	"github.com/alexedwards/scs/v2"
@@ -29,6 +30,9 @@ func NewPostHandler(
 
 func (h PostHandler) Register(mux chi.Router) {
 	mux.Route("/posts", func(r chi.Router) {
+		// Authorized routes
+		r.Use(middleware.RequireAuth(h.sessionManager))
+
 		// Create post
 		r.Post("/", h.CreatePost)
 
@@ -65,8 +69,11 @@ func (h PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get the userID making the request
+	userID := h.sessionManager.GetString(r.Context(), "user_id")
+
 	// Create the post
-	post, err := h.postService.CreatePost(req.AuthorID, req.Title, req.Content)
+	post, err := h.postService.CreatePost(userID, req.Title, req.Content)
 	if err != nil {
 		log.Println("CreatePost: failed to create post")
 		w.WriteHeader(http.StatusInternalServerError)

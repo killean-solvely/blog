@@ -37,6 +37,9 @@ func NewRouter(
 	r.Route("/api/v1", func(r chi.Router) {
 		postHandler := handlers.NewPostHandler(postService, sessionManager)
 		postHandler.Register(r)
+
+		userHandler := handlers.NewUserHandler(userService, sessionManager)
+		userHandler.Register(r)
 	})
 
 	return r
