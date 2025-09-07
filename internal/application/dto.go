@@ -33,15 +33,13 @@ func NewPostDTO(
 }
 
 func (dto *PostDTO) FromDomain(post *domain.Post) {
-	dto = NewPostDTO(
-		post.GetID().String(),
-		post.AuthorID().String(),
-		post.Title(),
-		post.Content(),
-		post.CreatedAt(),
-		post.LastEditedAt(),
-		post.ArchivedAt(),
-	)
+	dto.ID = post.GetID().String()
+	dto.AuthorID = post.AuthorID().String()
+	dto.Title = post.Title()
+	dto.Content = post.Content()
+	dto.CreatedAt = post.CreatedAt()
+	dto.LastEditedAt = post.LastEditedAt()
+	dto.ArchivedAt = post.ArchivedAt()
 }
 
 func (dto PostDTO) ToDomain() *domain.Post {
@@ -84,15 +82,13 @@ func NewCommentDTO(
 }
 
 func (dto *CommentDTO) FromDomain(comment *domain.Comment) {
-	dto = NewCommentDTO(
-		comment.GetID().String(),
-		comment.PostID().String(),
-		comment.CommenterID().String(),
-		comment.Content(),
-		comment.CreatedAt(),
-		comment.LastUpdatedAt(),
-		comment.ArchivedAt(),
-	)
+	dto.ID = comment.GetID().String()
+	dto.PostID = comment.PostID().String()
+	dto.CommenterID = comment.CommenterID().String()
+	dto.Content = comment.Content()
+	dto.CreatedAt = comment.CreatedAt()
+	dto.LastUpdatedAt = comment.LastUpdatedAt()
+	dto.ArchivedAt = comment.ArchivedAt()
 }
 
 func (dto CommentDTO) ToDomain() *domain.Comment {
@@ -139,15 +135,13 @@ func (dto *UserDTO) FromDomain(user *domain.User) {
 		roles = append(roles, role.String())
 	}
 
-	dto = NewUserDTO(
-		user.GetID().String(),
-		user.Email(),
-		user.Username(),
-		user.PasswordHash(),
-		user.Description(),
-		roles,
-		user.JoinDate(),
-	)
+	dto.ID = user.GetID().String()
+	dto.Email = user.Email()
+	dto.Username = user.Username()
+	dto.PasswordHash = user.PasswordHash()
+	dto.Description = user.Description()
+	dto.UserRoles = roles
+	dto.JoinDate = user.JoinDate()
 }
 
 func (dto *UserDTO) ToDomain() *domain.User {
@@ -192,14 +186,12 @@ func NewRatingDTO(
 }
 
 func (dto *RatingDTO) FromDomain(rating *domain.Rating) {
-	dto = NewRatingDTO(
-		rating.GetID().String(),
-		rating.PostID().String(),
-		rating.UserID().String(),
-		rating.RatingType().String(),
-		rating.CreatedAt(),
-		rating.UpdatedAt(),
-	)
+	dto.ID = rating.GetID().String()
+	dto.PostID = rating.PostID().String()
+	dto.UserID = rating.UserID().String()
+	dto.RatingType = rating.RatingType().String()
+	dto.CreatedAt = rating.CreatedAt()
+	dto.UpdatedAt = rating.UpdatedAt()
 }
 
 func (dto RatingDTO) ToDomain() *domain.Rating {
