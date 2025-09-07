@@ -8,16 +8,22 @@ import (
 	"blog/internal/application"
 	"blog/internal/interfaces/http/requests"
 
+	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
 )
 
 type PostHandler struct {
-	postService *application.PostService
+	postService    *application.PostService
+	sessionManager *scs.SessionManager
 }
 
-func NewPostHandler(postService *application.PostService) *PostHandler {
+func NewPostHandler(
+	postService *application.PostService,
+	sessionManager *scs.SessionManager,
+) *PostHandler {
 	return &PostHandler{
-		postService: postService,
+		postService:    postService,
+		sessionManager: sessionManager,
 	}
 }
 
