@@ -63,6 +63,36 @@ func (s *PostService) CreatePost(
 	return &postDTO, nil
 }
 
+func (s *PostService) GetPosts() ([]PostDTO, error) {
+	posts, err := s.postRepo.All()
+	if err != nil {
+		return nil, err
+	}
+
+	postDTOs := []PostDTO{}
+	for i := range posts {
+		postDTO := PostDTO{}
+		postDTO.FromDomain(&posts[i])
+		postDTOs = append(postDTOs, postDTO)
+	}
+
+	return postDTOs, nil
+}
+
+func (s *PostService) GetPost(id string) (*PostDTO, error) {
+	domainID := domain.NewPostID(id)
+
+	post, err := s.postRepo.FindByID(domainID)
+	if err != nil {
+		return nil, err
+	}
+
+	postDTO := PostDTO{}
+	postDTO.FromDomain(post)
+
+	return &postDTO, nil
+}
+
 func (s *PostService) UpdatePostTitle(postID string, newTitle string) error {
 	domainPostID := domain.NewPostID(postID)
 
