@@ -31,6 +31,18 @@ func (v *Validator) Required(value, fieldName string) *Error {
 	return nil
 }
 
+// RequiredStringSlice validates that a string slice is not nil or empty
+func (v *Validator) RequiredStringSlice(value []string, fieldName string) *Error {
+	if value == nil {
+		return &Error{
+			Field:   fieldName,
+			Message: "is required",
+			Code:    "required",
+		}
+	}
+	return nil
+}
+
 // MinLength validates minimum string length
 func (v *Validator) MinLength(value, fieldName string, min int) *Error {
 	if len(strings.TrimSpace(value)) < min {
@@ -49,6 +61,30 @@ func (v *Validator) MaxLength(value, fieldName string, max int) *Error {
 		return &Error{
 			Field:   fieldName,
 			Message: fmt.Sprintf("must be %d characters or less", max),
+			Code:    "max_length",
+		}
+	}
+	return nil
+}
+
+// MinLengthStringSlice validates minimum string slice length
+func (v *Validator) MinLengthStringSlice(value []string, fieldName string, min int) *Error {
+	if len(value) < min {
+		return &Error{
+			Field:   fieldName,
+			Message: fmt.Sprintf("must contain at least %d elements", min),
+			Code:    "min_length",
+		}
+	}
+	return nil
+}
+
+// MaxLengthStringSlice validates maximum string slice length
+func (v *Validator) MaxLengthStringSlice(value []string, fieldName string, max int) *Error {
+	if len(value) > max {
+		return &Error{
+			Field:   fieldName,
+			Message: fmt.Sprintf("must contain %d elements or less", max),
 			Code:    "max_length",
 		}
 	}
