@@ -31,14 +31,14 @@ func (s *UserService) CreateUser(
 	userRoles []string,
 ) (*UserDTO, error) {
 	// First things first, make sure the email / username aren't already being used
-	if exists, err := s.userRepo.EmailExists(email); !exists || err != nil {
+	if exists, err := s.userRepo.EmailExists(email); exists || err != nil {
 		if err != nil {
 			return nil, err
 		}
 		return nil, errors.New("email already in use")
 	}
 
-	if exists, err := s.userRepo.UsernameExists(username); !exists || err != nil {
+	if exists, err := s.userRepo.UsernameExists(username); exists || err != nil {
 		if err != nil {
 			return nil, err
 		}
