@@ -8,6 +8,8 @@ require (
 	go.uber.org/zap v1.27.0
 )
 
+require github.com/alexedwards/scs/v2 v2.9.0 // indirect
+
 require (
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/go-chi/chi/v5 v5.2.3

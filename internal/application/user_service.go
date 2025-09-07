@@ -203,6 +203,33 @@ func (s *UserService) UpdatePassword(userID, password string) error {
 	return nil
 }
 
+func (s *UserService) ValidatePassword(email, password string) (*UserDTO, error) {
+	user, err := s.userRepo.FindByEmail(email)
+	if err != nil {
+		return nil, errors.New("invalid email or password")
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash()), []byte(password)); err != nil {
+		return nil, errors.New("invalid email or password")
+	}
+
+	userDTO := UserDTO{}
+	userDTO.FromDomain(user)
+	return &userDTO, nil
+}
+
+func (s *UserService) GetUserByID(userID string) (*UserDTO, error) {
+	domainUserID := domain.NewUserID(userID)
+	user, err := s.userRepo.FindByID(domainUserID)
+	if err != nil {
+		return nil, err
+	}
+
+	userDTO := UserDTO{}
+	userDTO.FromDomain(user)
+	return &userDTO, nil
+}
+
 // Helper method to dispatch events for any aggregate with AggregateBase
 func (s *UserService) dispatchAggregateEvents(aggregate ddd.EventAggregate) error {
 	events := aggregate.GetUncommittedEvents()
