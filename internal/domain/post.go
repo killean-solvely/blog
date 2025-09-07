@@ -31,6 +31,7 @@ func NewPost(authorID UserID, title string, content string) (*Post, error) {
 
 	post := &Post{
 		AggregateBase: &ddd.AggregateBase{},
+		authorID:      authorID,
 		title:         title,
 		content:       content,
 		createdAt:     now,
