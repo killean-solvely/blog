@@ -203,14 +203,14 @@ func (s *UserService) UpdatePassword(userID, password string) error {
 	return nil
 }
 
-func (s *UserService) ValidatePassword(email, password string) (*UserDTO, error) {
-	user, err := s.userRepo.FindByEmail(email)
+func (s *UserService) ValidatePassword(username, password string) (*UserDTO, error) {
+	user, err := s.userRepo.FindByUsername(username)
 	if err != nil {
-		return nil, errors.New("invalid email or password")
+		return nil, errors.New("invalid username or password")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash()), []byte(password)); err != nil {
-		return nil, errors.New("invalid email or password")
+		return nil, errors.New("invalid username or password")
 	}
 
 	userDTO := UserDTO{}
@@ -218,9 +218,36 @@ func (s *UserService) ValidatePassword(email, password string) (*UserDTO, error)
 	return &userDTO, nil
 }
 
+func (s *UserService) GetAllUsers() ([]UserDTO, error) {
+	users, err := s.userRepo.All()
+	if err != nil {
+		return nil, err
+	}
+
+	userDTOs := []UserDTO{}
+	for _, user := range users {
+		userDTO := UserDTO{}
+		userDTO.FromDomain(&user)
+		userDTOs = append(userDTOs, userDTO)
+	}
+
+	return userDTOs, nil
+}
+
 func (s *UserService) GetUserByID(userID string) (*UserDTO, error) {
 	domainUserID := domain.NewUserID(userID)
 	user, err := s.userRepo.FindByID(domainUserID)
+	if err != nil {
+		return nil, err
+	}
+
+	userDTO := UserDTO{}
+	userDTO.FromDomain(user)
+	return &userDTO, nil
+}
+
+func (s *UserService) GetUserByUsername(username string) (*UserDTO, error) {
+	user, err := s.userRepo.FindByUsername(username)
 	if err != nil {
 		return nil, err
 	}

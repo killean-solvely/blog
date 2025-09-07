@@ -4,6 +4,7 @@ type UserRepository interface {
 	All() ([]User, error)
 	FindByID(id UserID) (*User, error)
 	FindByEmail(email string) (*User, error)
+	FindByUsername(username string) (*User, error)
 	Exists(id UserID) (bool, error)
 	UsernameExists(username string) (bool, error)
 	EmailExists(email string) (bool, error)

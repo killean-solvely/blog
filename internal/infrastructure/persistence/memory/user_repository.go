@@ -55,6 +55,19 @@ func (r *UserRepository) FindByEmail(email string) (*domain.User, error) {
 	return nil, nil
 }
 
+func (r *UserRepository) FindByUsername(username string) (*domain.User, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	for _, v := range r.users {
+		if v.Username() == username {
+			return &v, nil
+		}
+	}
+
+	return nil, nil
+}
+
 func (r *UserRepository) Exists(id domain.UserID) (bool, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
