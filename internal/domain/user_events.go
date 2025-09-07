@@ -46,74 +46,77 @@ func NewUserCreatedEvent(
 func (e UserCreatedEvent) OccurredOn() time.Time { return e.occurredOn }
 func (e UserCreatedEvent) EventType() string     { return string(UserCreatedEventType) }
 
-type UserRoleAdded struct {
+type UserRoleAddedEvent struct {
 	UserID     UserID
 	Role       UserRole
 	occurredOn time.Time
 }
 
-func NewUserRoleAddedEvent(id UserID, role UserRole) *UserRoleAdded {
-	return &UserRoleAdded{
+func NewUserRoleAddedEvent(id UserID, role UserRole) *UserRoleAddedEvent {
+	return &UserRoleAddedEvent{
 		UserID:     id,
 		Role:       role,
 		occurredOn: time.Now(),
 	}
 }
 
-func (e UserRoleAdded) OccurredOn() time.Time { return e.occurredOn }
-func (e UserRoleAdded) EventType() string     { return string(UserRoleAddedEventType) }
+func (e UserRoleAddedEvent) OccurredOn() time.Time { return e.occurredOn }
+func (e UserRoleAddedEvent) EventType() string     { return string(UserRoleAddedEventType) }
 
-type UserRoleRemoved struct {
+type UserRoleRemovedEvent struct {
 	UserID     UserID
 	Role       UserRole
 	occurredOn time.Time
 }
 
-func NewUserRoleRemovedEvent(id UserID, role UserRole) *UserRoleRemoved {
-	return &UserRoleRemoved{
+func NewUserRoleRemovedEvent(id UserID, role UserRole) *UserRoleRemovedEvent {
+	return &UserRoleRemovedEvent{
 		UserID:     id,
 		Role:       role,
 		occurredOn: time.Now(),
 	}
 }
 
-func (e UserRoleRemoved) OccurredOn() time.Time { return e.occurredOn }
-func (e UserRoleRemoved) EventType() string     { return string(UserRoleRemovedEventType) }
+func (e UserRoleRemovedEvent) OccurredOn() time.Time { return e.occurredOn }
+func (e UserRoleRemovedEvent) EventType() string     { return string(UserRoleRemovedEventType) }
 
-type UserDescriptionUpdated struct {
+type UserDescriptionUpdatedEvent struct {
 	UserID      UserID
 	Description string
 	occurredOn  time.Time
 }
 
-func NewUserDescriptionUpdatedEvent(id UserID, description string) *UserDescriptionUpdated {
-	return &UserDescriptionUpdated{
+func NewUserDescriptionUpdatedEvent(id UserID, description string) *UserDescriptionUpdatedEvent {
+	return &UserDescriptionUpdatedEvent{
 		UserID:      id,
 		Description: description,
 		occurredOn:  time.Now(),
 	}
 }
 
-func (e UserDescriptionUpdated) OccurredOn() time.Time { return e.occurredOn }
+func (e UserDescriptionUpdatedEvent) OccurredOn() time.Time { return e.occurredOn }
 
-func (e UserDescriptionUpdated) EventType() string { return string(UserDescriptionUpdatedEventType) }
+func (e UserDescriptionUpdatedEvent) EventType() string {
+	return string(UserDescriptionUpdatedEventType)
+}
 
-type UserPasswordUpdated struct {
+type UserPasswordUpdatedEvent struct {
 	UserID     UserID
 	Password   string
 	occurredOn time.Time
 }
 
-func NewUserPasswordUpdatedEvent(id UserID, description string) *UserPasswordUpdated {
-	return &UserPasswordUpdated{
+func NewUserPasswordUpdatedEvent(id UserID, description string) *UserPasswordUpdatedEvent {
+	return &UserPasswordUpdatedEvent{
 		UserID:     id,
 		Password:   description,
 		occurredOn: time.Now(),
 	}
 }
 
-func (e UserPasswordUpdated) OccurredOn() time.Time { return e.occurredOn }
-func (e UserPasswordUpdated) EventType() string     { return string(UserPasswordUpdatedEventType) }
+func (e UserPasswordUpdatedEvent) OccurredOn() time.Time { return e.occurredOn }
+
+func (e UserPasswordUpdatedEvent) EventType() string { return string(UserPasswordUpdatedEventType) }
 
 func init() {
 	ddd.EventRegistry.Register(
@@ -122,22 +125,22 @@ func init() {
 	)
 
 	ddd.EventRegistry.Register(
-		UserRoleAdded{},
+		UserRoleAddedEvent{},
 		"Raised when a new role is added to a user",
 	)
 
 	ddd.EventRegistry.Register(
-		UserRoleRemoved{},
+		UserRoleRemovedEvent{},
 		"Raised when a role is removed from a user",
 	)
 
 	ddd.EventRegistry.Register(
-		UserDescriptionUpdated{},
+		UserDescriptionUpdatedEvent{},
 		"Raised when a user's description is updated",
 	)
 
 	ddd.EventRegistry.Register(
-		UserPasswordUpdated{},
+		UserPasswordUpdatedEvent{},
 		"Raised when a user's password is updated",
 	)
 }
