@@ -12,5 +12,6 @@ var (
 	ErrContentCannotBeEmpty = errors.New("post content cannot be empty")
 
 	// Comment
+	ErrCommentNotFound      = errors.New("comment not found")
 	ErrCommentCannotBeEmpty = errors.New("comment cannot be empty")
 )
