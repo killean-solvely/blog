@@ -143,5 +143,21 @@ func RebuildUser(
 	userRoles []UserRole,
 	joinDate time.Time,
 ) *User {
-	return nil
+	setRoles := map[UserRole]bool{}
+	for _, role := range userRoles {
+		setRoles[role] = true
+	}
+
+	user := &User{
+		AggregateBase: &ddd.AggregateBase{},
+		email:         email,
+		passwordHash:  passwordHash,
+		username:      username,
+		description:   description,
+		userRoles:     setRoles,
+		joinDate:      joinDate,
+	}
+	user.SetID(id)
+
+	return user
 }
