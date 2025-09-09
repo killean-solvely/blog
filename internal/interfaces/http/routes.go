@@ -40,6 +40,9 @@ func NewRouter(
 
 		userHandler := handlers.NewUserHandler(userService, sessionManager)
 		userHandler.Register(r)
+
+		ratingHandler := handlers.NewRatingHandler(ratingService, sessionManager)
+		ratingHandler.Register(r)
 	})
 
 	return r

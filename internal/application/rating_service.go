@@ -29,6 +29,38 @@ func NewRatingService(
 	}
 }
 
+func (s RatingService) GetRatingsOnPost(postID string) ([]RatingDTO, error) {
+	domainPostID := domain.NewPostID(postID)
+
+	ratings, err := s.ratingRepo.FindByPost(domainPostID)
+	if err != nil {
+		return nil, err
+	}
+
+	ratingDTOs := []RatingDTO{}
+	for i := range ratings {
+		ratingDTO := RatingDTO{}
+		ratingDTO.FromDomain(&ratings[i])
+		ratingDTOs = append(ratingDTOs, ratingDTO)
+	}
+
+	return ratingDTOs, nil
+}
+
+func (s RatingService) GetRating(ratingID string) (*RatingDTO, error) {
+	domainRatingID := domain.NewRatingID(ratingID)
+
+	rating, err := s.ratingRepo.FindByID(domainRatingID)
+	if err != nil {
+		return nil, err
+	}
+
+	ratingDTO := RatingDTO{}
+	ratingDTO.FromDomain(rating)
+
+	return &ratingDTO, nil
+}
+
 func (s *RatingService) CreateRating(
 	postID string,
 	userID string,
@@ -159,4 +191,3 @@ func (s *RatingService) dispatchAggregateEvents(aggregate ddd.EventAggregate) er
 	aggregate.MarkEventsAsCommitted()
 	return nil
 }
-
