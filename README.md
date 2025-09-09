@@ -110,18 +110,38 @@ make help                               # Show all available commands
 - `POST /api/v1/logout` - User logout
 
 ### Users
-- `GET /api/v1/users` - Get all users (authenticated)
-- `GET /api/v1/users/{id}` - Get user by ID (authenticated)
-- `POST /api/v1/users/{id}/description` - Update user description (authenticated)
-- `POST /api/v1/users/{id}/password` - Update user password (authenticated)
+- `GET /api/v1/users` - Get all users
+- `GET /api/v1/users/{id}` - Get user by ID
+- `POST /api/v1/users/description` - Update user description (authenticated)
+- `POST /api/v1/users/password` - Update user password (authenticated)
 
 ### Posts
-- `GET /api/v1/posts` - Get all posts (authenticated)
-- `GET /api/v1/posts/{id}` - Get post by ID (authenticated)
+- `GET /api/v1/posts` - Get all posts
+- `GET /api/v1/posts/{id}` - Get post by ID
 - `POST /api/v1/posts` - Create new post (authenticated)
 - `PATCH /api/v1/posts/{id}/title` - Update post title (authenticated)
 - `PATCH /api/v1/posts/{id}/content` - Update post content (authenticated)
 - `DELETE /api/v1/posts/{id}` - Archive post (authenticated)
+
+### Comments
+- `GET /api/v1/comments` - Get all comments
+- `GET /api/v1/comments/{id}` - Get comment by ID
+- `GET /api/v1/posts/{postId}/comments` - Get comments for a specific post
+- `POST /api/v1/posts/{postId}/comments` - Create comment on post (authenticated)
+- `PATCH /api/v1/comments/{id}` - Edit comment (authenticated, owner only)
+- `DELETE /api/v1/comments/{id}` - Archive comment (authenticated, owner only)
+
+### Ratings
+- `GET /api/v1/ratings/posts/{post_id}` - Get ratings for a specific post
+- `GET /api/v1/ratings/{id}` - Get rating by ID
+- `POST /api/v1/ratings` - Create rating (authenticated)
+- `PATCH /api/v1/ratings/{id}` - Change rating (authenticated, owner only)
+- `DELETE /api/v1/ratings/{id}` - Remove rating (authenticated, owner only)
+
+### Admin
+- `POST /api/v1/admin/users/{id}/roles` - Set user roles (admin only)
+- `POST /api/v1/admin/users/{id}/description` - Update user description (admin only)
+- `POST /api/v1/admin/users/{id}/password` - Update user password (admin only)
 
 ### Health Check
 - `GET /health` - Service health status
