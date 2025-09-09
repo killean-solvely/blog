@@ -8,7 +8,7 @@ import (
 
 	"blog/internal/application"
 	"blog/internal/infrastructure/events"
-	"blog/internal/infrastructure/persistence/memory"
+	"blog/internal/infrastructure/persistence/sqlite"
 	httphandler "blog/internal/interfaces/http"
 )
 
@@ -25,10 +25,19 @@ func main() {
 	ratingEventHandler.Register(eventDispatcher)
 	userEventHandler.Register(eventDispatcher)
 
-	commentRepo := memory.NewCommentRepository()
-	postRepo := memory.NewPostRepository()
-	ratingRepo := memory.NewRatingRepository()
-	userRepo := memory.NewUserRepository()
+	db, err := sqlite.NewDB()
+	if err != nil {
+		panic(err)
+	}
+
+	if err := db.Ping(); err != nil {
+		panic("failed db ping")
+	}
+
+	commentRepo := sqlite.NewCommentRepository(db.DB)
+	postRepo := sqlite.NewPostRepository(db.DB)
+	ratingRepo := sqlite.NewRatingRepository(db.DB)
+	userRepo := sqlite.NewUserRepository(db.DB)
 
 	commentService := application.NewCommentService(
 		commentRepo,
@@ -39,18 +48,6 @@ func main() {
 	postService := application.NewPostService(postRepo, userRepo, eventDispatcher)
 	ratingService := application.NewRatingService(ratingRepo, userRepo, postRepo, eventDispatcher)
 	userService := application.NewUserService(userRepo, eventDispatcher)
-
-	newUser, err := userService.CreateUser(
-		"a@abc.com",
-		"12345678",
-		"a",
-		[]string{"COMMENTER", "AUTHOR"},
-	)
-	if err != nil {
-		panic(err)
-	}
-
-	postService.CreatePost(newUser.ID, "New Post", "Post Content")
 
 	router := httphandler.NewRouter(postService, userService, commentService, ratingService)
 

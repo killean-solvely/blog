@@ -209,4 +209,3 @@ func stringToRoles(rolesStr string) []domain.UserRole {
 
 	return roles
 }
-

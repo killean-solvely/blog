@@ -5,16 +5,16 @@ import (
 )
 
 type DB struct {
-	db *sqlx.DB
+	*sqlx.DB
 }
 
 func NewDB() (*DB, error) {
-	db, err := sqlx.Connect("sqlite3", "file:data.sqlite")
+	db, err := sqlx.Connect("sqlite3", "file:blog.db")
 	if err != nil {
 		return nil, err
 	}
 
 	return &DB{
-		db: db,
+		DB: db,
 	}, nil
 }
