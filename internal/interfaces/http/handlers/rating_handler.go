@@ -31,7 +31,7 @@ func NewRatingHandler(
 func (h RatingHandler) Register(mux chi.Router) {
 	mux.Route("/ratings", func(r chi.Router) {
 		// Get ratings on post
-		r.Get("/post/{post_id}", nil)
+		r.Get("/posts/{post_id}", nil)
 
 		// Get rating
 		r.Get("/{id}", nil)
