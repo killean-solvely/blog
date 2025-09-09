@@ -55,6 +55,11 @@ func (h AdminHandler) SetUserRoles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userID := chi.URLParam(r, "id")
+	if userID == "" {
+		log.Println("SetUserRoles: missing user_id")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	// Update the user's roles
 	if err := h.userService.SetUserRoles(userID, req.UserRoles); err != nil {
@@ -83,6 +88,11 @@ func (h AdminHandler) UpdateUserDescription(w http.ResponseWriter, r *http.Reque
 	}
 
 	userID := chi.URLParam(r, "id")
+	if userID == "" {
+		log.Println("UpdateUserDescription: missing user_id")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	// Update the user's description
 	if err := h.userService.UpdateDescription(userID, req.Description); err != nil {
@@ -111,6 +121,11 @@ func (h AdminHandler) UpdateUserPassword(w http.ResponseWriter, r *http.Request)
 	}
 
 	userID := chi.URLParam(r, "id")
+	if userID == "" {
+		log.Println("UpdateUserPassword: missing user_id")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	// Update the user's password
 	if err := h.userService.UpdatePassword(userID, req.Password); err != nil {
