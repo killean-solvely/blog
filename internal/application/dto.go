@@ -55,13 +55,13 @@ func (dto PostDTO) ToDomain() *domain.Post {
 }
 
 type CommentDTO struct {
-	ID            string
-	PostID        string
-	CommenterID   string
-	Content       string
-	CreatedAt     time.Time
-	LastUpdatedAt *time.Time
-	ArchivedAt    *time.Time
+	ID            string     `json:"id"`
+	PostID        string     `json:"post_id"`
+	CommenterID   string     `json:"commenter_id"`
+	Content       string     `json:"content"`
+	CreatedAt     time.Time  `json:"created_at"`
+	LastUpdatedAt *time.Time `json:"last_updated_at"`
+	ArchivedAt    *time.Time `json:"archived_at"`
 }
 
 func NewCommentDTO(
@@ -104,13 +104,13 @@ func (dto CommentDTO) ToDomain() *domain.Comment {
 }
 
 type UserDTO struct {
-	ID           string
-	Email        string
-	PasswordHash string
-	Username     string
-	Description  string
-	UserRoles    []string
-	JoinDate     time.Time
+	ID           string    `json:"id"`
+	Email        string    `json:"email"`
+	PasswordHash string    `json:"password_hash"`
+	Username     string    `json:"username"`
+	Description  string    `json:"description"`
+	UserRoles    []string  `json:"user_roles"`
+	JoinDate     time.Time `json:"join_date"`
 }
 
 func NewUserDTO(
