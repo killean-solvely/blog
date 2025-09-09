@@ -39,23 +39,22 @@ func (h UserHandler) Register(mux chi.Router) {
 	mux.Post("/logout", h.LogoutUser)
 
 	mux.Route("/users", func(r chi.Router) {
-		// Authorized routes
-		r.Use(middleware.RequireAuth(h.sessionManager))
-
-		// Set user roles
-		r.Post("/{id}/roles", h.SetUserRoles)
-
-		// Update user description
-		r.Post("/{id}/description", h.UpdateUserDescription)
-
-		// Update user password
-		r.Post("/{id}/password", h.UpdateUserPassword)
-
 		// Get user by id
 		r.Get("/{id}", h.GetUser)
 
 		// Get users
 		r.Get("/", h.GetUsers)
+
+		r.Group(func(r chi.Router) {
+			// Protected routes
+			r.Use(middleware.RequireAuth(h.sessionManager))
+
+			// Update user description
+			r.Post("/description", h.UpdateUserDescription)
+
+			// Update user password
+			r.Post("/password", h.UpdateUserPassword)
+		})
 	})
 }
 
@@ -138,6 +137,46 @@ func (h UserHandler) LogoutUser(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+func (h UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
+	userID := chi.URLParam(r, "id")
+
+	user, err := h.userService.GetUserByID(userID)
+	if err != nil {
+		log.Println("GetUser: failed to get user")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(user)
+	if err != nil {
+		log.Println("GetUser: failed to marshal user")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.Write(data)
+}
+
+func (h UserHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
+	user, err := h.userService.GetAllUsers()
+	if err != nil {
+		log.Println("GetUsers: failed to get users")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(user)
+	if err != nil {
+		log.Println("GetUsers: failed to marshal users")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.Write(data)
 }
 
 func (h UserHandler) SetUserRoles(w http.ResponseWriter, r *http.Request) {
@@ -225,44 +264,4 @@ func (h UserHandler) UpdateUserPassword(w http.ResponseWriter, r *http.Request) 
 	}
 
 	w.WriteHeader(http.StatusOK)
-}
-
-func (h UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
-	userID := chi.URLParam(r, "id")
-
-	user, err := h.userService.GetUserByID(userID)
-	if err != nil {
-		log.Println("GetUser: failed to get user")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	data, err := json.Marshal(user)
-	if err != nil {
-		log.Println("GetUser: failed to marshal user")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Add("Content-Type", "application/json")
-	w.Write(data)
-}
-
-func (h UserHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
-	user, err := h.userService.GetAllUsers()
-	if err != nil {
-		log.Println("GetUsers: failed to get users")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	data, err := json.Marshal(user)
-	if err != nil {
-		log.Println("GetUsers: failed to marshal users")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Add("Content-Type", "application/json")
-	w.Write(data)
 }

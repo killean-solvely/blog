@@ -30,66 +30,29 @@ func NewPostHandler(
 
 func (h PostHandler) Register(mux chi.Router) {
 	mux.Route("/posts", func(r chi.Router) {
-		// Authorized routes
-		r.Use(middleware.RequireAuth(h.sessionManager))
-
-		// Create post
-		r.Post("/", h.CreatePost)
-
 		// Get posts
 		r.Get("/", h.GetPosts)
 
 		// Get post
 		r.Get("/{id}", h.GetPost)
 
-		// Update post title
-		r.Patch("/{id}/title", h.UpdatePostTitle)
+		r.Group(func(r chi.Router) {
+			// Authorized routes
+			r.Use(middleware.RequireAuth(h.sessionManager))
 
-		// Update post content
-		r.Patch("/{id}/content", h.UpdatePostContent)
+			// Create post
+			r.Post("/", h.CreatePost)
 
-		// Archive post
-		r.Delete("/{id}", h.ArchivePost)
+			// Update post title
+			r.Patch("/{id}/title", h.UpdatePostTitle)
+
+			// Update post content
+			r.Patch("/{id}/content", h.UpdatePostContent)
+
+			// Archive post
+			r.Delete("/{id}", h.ArchivePost)
+		})
 	})
-}
-
-func (h PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
-	// Decode the request and validate it
-	var req requests.CreatePostRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		log.Println("CreatePost: failed to decode request")
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	if errors := req.Validate(); errors != nil {
-		log.Println("CreatePost: invalid request data")
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(errors.Error()))
-		return
-	}
-
-	// Get the userID making the request
-	userID := h.sessionManager.GetString(r.Context(), "user_id")
-
-	// Create the post
-	post, err := h.postService.CreatePost(userID, req.Title, req.Content)
-	if err != nil {
-		log.Println("CreatePost: failed to create post")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	// Return the post to the requester
-	data, err := json.Marshal(post)
-	if err != nil {
-		log.Println("CreatePost: failed to marshal post")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Add("Content-Type", "application/json")
-	w.Write(data)
 }
 
 func (h PostHandler) GetPosts(w http.ResponseWriter, r *http.Request) {
@@ -141,6 +104,45 @@ func (h PostHandler) GetPost(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
+func (h PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
+	// Decode the request and validate it
+	var req requests.CreatePostRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Println("CreatePost: failed to decode request")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if errors := req.Validate(); errors != nil {
+		log.Println("CreatePost: invalid request data")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(errors.Error()))
+		return
+	}
+
+	// Get the userID making the request
+	userID := h.sessionManager.GetString(r.Context(), "user_id")
+
+	// Create the post
+	post, err := h.postService.CreatePost(userID, req.Title, req.Content)
+	if err != nil {
+		log.Println("CreatePost: failed to create post")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// Return the post to the requester
+	data, err := json.Marshal(post)
+	if err != nil {
+		log.Println("CreatePost: failed to marshal post")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.Write(data)
+}
+
 func (h PostHandler) UpdatePostTitle(w http.ResponseWriter, r *http.Request) {
 	// Decode the request and validate it
 	var req requests.UpdatePostTitle
@@ -162,6 +164,23 @@ func (h PostHandler) UpdatePostTitle(w http.ResponseWriter, r *http.Request) {
 	if id == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("missing post id"))
+		return
+	}
+
+	// Get the userID from the session
+	userID := h.sessionManager.GetString(r.Context(), "user_id")
+
+	// Get the post and make sure that the user editing it is the owner
+	post, err := h.postService.GetPost(id)
+	if err != nil {
+		log.Println("UpdatePostTitle: failed to get post")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if post.AuthorID != userID {
+		log.Println("UpdatePostTitle: non-author attempting to edit post")
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -199,6 +218,23 @@ func (h PostHandler) UpdatePostContent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get the userID from the session
+	userID := h.sessionManager.GetString(r.Context(), "user_id")
+
+	// Get the post and make sure that the user editing it is the owner
+	post, err := h.postService.GetPost(id)
+	if err != nil {
+		log.Println("UpdatePostContent: failed to get post")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if post.AuthorID != userID {
+		log.Println("UpdatePostContent: non-author attempting to edit post")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	// Update the post content
 	if err := h.postService.UpdatePostContent(id, req.Content); err != nil {
 		log.Println("UpdatePostContent: failed to update post content")
@@ -214,6 +250,23 @@ func (h PostHandler) ArchivePost(w http.ResponseWriter, r *http.Request) {
 	if id == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("missing post id"))
+		return
+	}
+
+	// Get the userID from the session
+	userID := h.sessionManager.GetString(r.Context(), "user_id")
+
+	// Get the post and make sure that the user editing it is the owner
+	post, err := h.postService.GetPost(id)
+	if err != nil {
+		log.Println("ArchivePost: failed to get post")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if post.AuthorID != userID {
+		log.Println("ArchivePost: non-author attempting to archive post")
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
