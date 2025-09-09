@@ -29,6 +29,54 @@ func NewCommentService(
 	}
 }
 
+func (s *CommentService) GetComments() ([]*CommentDTO, error) {
+	comments, err := s.commentRepo.All()
+	if err != nil {
+		return nil, err
+	}
+
+	var commentDTOs []*CommentDTO
+	for _, comment := range comments {
+		dto := &CommentDTO{}
+		dto.FromDomain(&comment)
+		commentDTOs = append(commentDTOs, dto)
+	}
+
+	return commentDTOs, nil
+}
+
+func (s *CommentService) GetComment(commentID string) (*CommentDTO, error) {
+	domainCommentID := domain.NewCommentID(commentID)
+	
+	comment, err := s.commentRepo.FindByID(domainCommentID)
+	if err != nil {
+		return nil, err
+	}
+
+	dto := &CommentDTO{}
+	dto.FromDomain(comment)
+
+	return dto, nil
+}
+
+func (s *CommentService) GetCommentsByPost(postID string) ([]*CommentDTO, error) {
+	domainPostID := domain.NewPostID(postID)
+	
+	comments, err := s.commentRepo.FindByPost(domainPostID)
+	if err != nil {
+		return nil, err
+	}
+
+	var commentDTOs []*CommentDTO
+	for _, comment := range comments {
+		dto := &CommentDTO{}
+		dto.FromDomain(&comment)
+		commentDTOs = append(commentDTOs, dto)
+	}
+
+	return commentDTOs, nil
+}
+
 func (s *CommentService) CreateComment(
 	postID string,
 	commenterID string,
